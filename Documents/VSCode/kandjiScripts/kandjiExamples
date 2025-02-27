@@ -1,0 +1,54 @@
+#!/bin/bash
+# Remove temporary and cache files to free up disk space
+rm -rf ~/Library/Caches/*
+rm -rf ~/Library/Logs/*
+rm -rf /Library/Logs/DiagnosticReports/*
+
+
+# Check for available macOS updates
+softwareupdate -l
+
+
+# Check if FileVault is enabled
+fdesetup status
+# Check firewall status
+/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+# Check SIP status
+csrutil status
+
+
+# Get battery health information
+system_profiler SPPowerDataType
+
+
+# Collect network configuration details
+networksetup -listallnetworkservices
+ipconfig getpacket en0
+
+
+# Check if required applications are installed
+required_apps=("Slack" "Microsoft Word" "Google Chrome" "Zoom.us")
+
+for app in "${required_apps[@]}"; do
+  if [ -d "/Applications/${app}.app" ]; then
+    echo "${app} is installed"
+  else
+    echo "${app} is NOT installed"
+  fi
+done
+
+
+# Collect performance metrics
+top -l 1 | head -n 10
+vm_stat
+df -h
+
+
+# Create standard folder structure for new employees
+mkdir -p ~/Documents/Company
+mkdir -p ~/Documents/Company/Projects
+mkdir -p ~/Documents/Company/Training
+
+
+# Set default browser to Chrome
+open -a "Google Chrome" --args --make-default-browser
